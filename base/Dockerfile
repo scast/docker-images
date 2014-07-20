@@ -14,12 +14,15 @@ RUN apt-get install -y -q software-properties-common command-not-found
 RUN apt-get install -y -q build-essential tig man atool
 RUN apt-get install -y -q zsh wget curl tmux htop aptitude psmisc
 RUN apt-get install -y -q emacs24-nox nano vim python-pygments
-RUN apt-get install -y -q git mercurial subversion
+RUN apt-get install -y -q git mercurial subversion atfs
 
 # Some interfacing with PostgreSQL
 # - server dev to build drivers
 # - client for psql
 RUN apt-get install -y -q postgresql-server-dev-9.3 postgresql-client-9.3
+
+# Install MySQL client
+RUN apt-get install -y -q mysql-client
 
 # Node.js stuff
 # - coffee script
@@ -43,7 +46,7 @@ RUN pip install ipython
 # - compass
 # - bundler
 # - rake
-RUN apt-get install -y -q ruby
+RUN apt-get install -y -q ruby ruby1.9.1-dev
 RUN gem install compass bundler rake
 
 # Go
