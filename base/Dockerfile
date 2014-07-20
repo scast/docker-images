@@ -1,4 +1,4 @@
-FROM rastasheep/ubuntu-sshd:14.04
+FROM ubuntu:14.04
 MAINTAINER Simón Castillo, <scastb@gmail.com>
 
 # Fix locales
@@ -11,7 +11,7 @@ RUN echo "LANG=en_US.UTF-8" > /etc/environment
 RUN apt-get update
 RUN apt-get dist-upgrade -y -q
 RUN apt-get install -y -q software-properties-common command-not-found
-RUN apt-get install -y -q build-essential tig man atool
+RUN apt-get install -y -q build-essential tig man atool openssh-server
 RUN apt-get install -y -q zsh wget curl tmux htop aptitude psmisc
 RUN apt-get install -y -q emacs24-nox nano vim python-pygments
 RUN apt-get install -y -q git mercurial subversion atfs
@@ -19,7 +19,15 @@ RUN apt-get install -y -q git mercurial subversion atfs
 # Install supervisord
 RUN apt-get install -y -q supervisor
 RUN mkdir -p /var/log/supervisor
-ADD configs/supervisord/supervisor.conf /etc/supervisor/conf.d/supervisor.conf
+ADD confs/supervisord/supervisor.conf /etc/supervisor/conf.d/supervisor.conf
+
+# Setup OpenSSH
+ADD confs/sshd/supervisor.conf /etc/supervisor/conf.d/openssh.conf
+RUN echo 'root:root' | chpasswd
+RUN sed -ri 's/^PermitRootLogin\s+.*/PermitRootLogin yes/' /etc/ssh/sshd_config
+RUN sed -ri 's/UsePAM yes/#UsePAM yes/g' /etc/ssh/sshd_config
+RUN mkdir -p /var/run/sshd
+RUN chmod 755 /var/run/sshd
 
 # Some interfacing with PostgreSQL
 # - server dev to build drivers
@@ -65,4 +73,5 @@ RUN chsh --shell $(which zsh)
 # Configure Tmux
 ADD confs/tmux/tmux.conf /root/.tmux.conf
 
-CMD    ["/usr/sbin/sshd", "-D"]
+EXPOSE 22
+CMD ["supervisord"]
