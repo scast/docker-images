@@ -54,10 +54,10 @@ RUN apt-get install -y golang
 
 # Change to ZSH
 RUN git clone git://github.com/robbyrussell/oh-my-zsh.git /root/.oh-my-zsh
-ADD zshrc /root/.zshrc
+ADD confs/zsh/zshrc /root/.zshrc
 RUN chsh --shell $(which zsh)
 
 # Configure Tmux
-ADD tmux.conf /root/.tmux.conf
+ADD confs/tmux/tmux.conf /root/.tmux.conf
 
 CMD    ["/usr/sbin/sshd", "-D"]
