@@ -16,6 +16,11 @@ RUN apt-get install -y -q zsh wget curl tmux htop aptitude psmisc
 RUN apt-get install -y -q emacs24-nox nano vim python-pygments
 RUN apt-get install -y -q git mercurial subversion atfs
 
+# Install supervisord
+RUN apt-get install -y -q supervisor
+RUN mkdir -p /var/log/supervisor
+ADD configs/supervisord/supervisor.conf /etc/supervisor/conf.d/supervisor.conf
+
 # Some interfacing with PostgreSQL
 # - server dev to build drivers
 # - client for psql
