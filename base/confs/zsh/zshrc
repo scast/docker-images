@@ -41,7 +41,7 @@ DISABLE_UNTRACKED_FILES_DIRTY="true"
 # Would you like to use another custom folder than $ZSH/custom?
 # ZSH_CUSTOM=/path/to/new-custom-folder
 
-ZSH_TMUX_AUTOSTART=true
+ZSH_TMUX_AUTOSTART=false
 
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
@@ -56,7 +56,7 @@ ZSH_TMUX_AUTOSTART=true
 plugins=(git bower bundler coffee colored-man colorize command-not-found \
     common-aliases cp dirhistory django fabric gem git-extras gitignore golang \
     heroku history-substring-search jsontools mercurial npm \
-    pip python rsync supervisor svn systemadmin tmuxinator tmux \
+    pip python rsync supervisor svn systemadmin tmuxinator \
     history-substring-search git-flow-avh)
 
 # TODO: git (hub)flow,

@@ -1,5 +1,23 @@
-FROM ubuntu:14.04
+# Use phusion/baseimage as base image. To make your builds reproducible, make
+# sure you lock down to a specific version, not to `latest`!
+# See https://github.com/phusion/baseimage-docker/blob/master/Changelog.md for
+# a list of version numbers.
+FROM phusion/baseimage:0.9.12
 MAINTAINER Simón Castillo, <scastb@gmail.com>
+
+# Set correct environment variables.
+ENV HOME /root
+
+# Regenerate SSH host keys. baseimage-docker does not contain any, so you
+# have to do that yourself. You may also comment out this instruction; the
+# init system will auto-generate one during boot.
+RUN /etc/my_init.d/00_regen_ssh_host_keys.sh
+
+# Use baseimage-docker's init system.
+CMD ["/sbin/my_init"]
+
+# WARNING: only for development environments!
+RUN /usr/sbin/enable_insecure_key
 
 # Fix locales
 RUN locale-gen en_US.UTF-8
@@ -14,20 +32,8 @@ RUN apt-get install -y -q software-properties-common command-not-found
 RUN apt-get install -y -q build-essential tig man atool openssh-server
 RUN apt-get install -y -q zsh wget curl tmux htop aptitude psmisc
 RUN apt-get install -y -q emacs24-nox nano vim python-pygments
-RUN apt-get install -y -q git mercurial subversion atfs
-
-# Install supervisord
-RUN apt-get install -y -q supervisor
-RUN mkdir -p /var/log/supervisor
-ADD confs/supervisord/supervisor.conf /etc/supervisor/conf.d/supervisor.conf
-
-# Setup OpenSSH
-ADD confs/sshd/supervisor.conf /etc/supervisor/conf.d/openssh.conf
-RUN echo 'root:root' | chpasswd
-RUN sed -ri 's/^PermitRootLogin\s+.*/PermitRootLogin yes/' /etc/ssh/sshd_config
-RUN sed -ri 's/UsePAM yes/#UsePAM yes/g' /etc/ssh/sshd_config
-RUN mkdir -p /var/run/sshd
-RUN chmod 755 /var/run/sshd
+RUN apt-get install -y -q git subversion atfs
+RUN apt-get install -y -q --no-install-recommends mercurial
 
 # Some interfacing with PostgreSQL
 # - server dev to build drivers
@@ -62,16 +68,15 @@ RUN pip install ipython
 RUN apt-get install -y -q ruby ruby1.9.1-dev
 RUN gem install compass bundler rake
 
-# Go
-RUN apt-get install -y golang
+# # Go
+# RUN apt-get install -y golang
 
 # Change to ZSH
-RUN git clone git://github.com/robbyrussell/oh-my-zsh.git /root/.oh-my-zsh
+RUN git clone https://github.com/robbyrussell/oh-my-zsh.git /root/.oh-my-zsh
 ADD confs/zsh/zshrc /root/.zshrc
-RUN chsh --shell $(which zsh)
 
 # Configure Tmux
 ADD confs/tmux/tmux.conf /root/.tmux.conf
 
-EXPOSE 22
-CMD ["supervisord"]
+# Clean up APT when done.
+RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
